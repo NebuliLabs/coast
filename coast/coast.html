@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Coast</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      width: 100%;
+      font-family: 'Segoe UI', sans-serif;
+      transition: background 0.4s ease, color 0.4s ease;
+    }
+
+    body {
+      background: url('https://nebulilabs.github.io/coast/coast.jpg') no-repeat center center fixed;
+      background-size: cover;
+    }
+
+    h1 {
+      font-size: 4rem;
+      color: #fff;
+      margin-bottom: 20px;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    h1::before {
+      content: "coast";
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      filter: blur(8px);
+      opacity: 0.7;
+      z-index: -1;
+      color: white;
+    }
+
+    .search-bar {
+      width: 400px;
+      max-width: 90%;
+      padding: 12px 20px;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      border-radius: 999px;
+      font-size: 1.1rem;
+      outline: none;
+      backdrop-filter: blur(6px);
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      transition: all 0.2s ease;
+      display: block;
+      margin: 0 auto;
+    }
+
+    .search-bar::placeholder {
+      color: #eee;
+    }
+
+    .search-bar:focus {
+      border-color: #fff;
+    }
+
+    .button-container {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      display: flex;
+      gap: 12px;
+      z-index: 10;
+    }
+
+    .glass-circle {
+      width: 48px;
+      height: 48px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .glass-circle:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: -260px;
+      width: 250px;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      border-right: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      transition: left 0.3s ease;
+      z-index: 9;
+    }
+
+    .sidebar.show {
+      left: 0;
+    }
+
+    .sidebar a {
+      color: white;
+      text-decoration: none;
+      font-size: 1.1rem;
+      padding: 8px 12px;
+      border-radius: 8px;
+      transition: background 0.2s ease;
+    }
+
+    .sidebar a:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 16px;
+      padding: 30px;
+      color: white;
+      z-index: 100;
+      display: none;
+      flex-direction: column;
+      gap: 20px;
+      text-align: center;
+      width: 90%;
+      max-width: 600px;
+    }
+
+    .popup.show {
+      display: flex;
+    }
+
+    .background-options {
+      display: flex;
+      justify-content: space-around;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .bg-option {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    .bg-option img {
+      width: 140px;
+      height: 90px;
+      object-fit: cover;
+      border-radius: 12px;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      transition: transform 0.2s ease;
+    }
+
+    .bg-option:hover img {
+      transform: scale(1.05);
+    }
+
+    .bg-option span {
+      color: white;
+      font-size: 0.95rem;
+    }
+
+    .popup .upload {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .upload input[type="file"] {
+      display: none;
+    }
+
+    .upload label {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 10px 20px;
+      border-radius: 999px;
+      cursor: pointer;
+      color: white;
+      font-size: 0.95rem;
+      transition: background 0.3s ease;
+    }
+
+    .upload label:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .upload small {
+      color: #ccc;
+      font-size: 0.85rem;
+      max-width: 300px;
+      text-align: center;
+    }
+
+    .popup .close-btn,
+    .popup .dark-btn {
+      padding: 10px 20px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 999px;
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .popup .close-btn:hover,
+    .popup .dark-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .popup .btn-row {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    main {
+      height: 100vh;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      z-index: 0;
+    }
+
+    /* Dark Mode UI Tweaks */
+    body.dark .sidebar,
+    body.dark .popup,
+    body.dark .search-bar,
+    body.dark .glass-circle {
+      background: rgba(20, 20, 20, 0.5);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    body.dark .popup .close-btn,
+    body.dark .popup .dark-btn,
+    body.dark .upload label {
+      background: rgba(40, 40, 40, 0.3);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    body.dark h1,
+    body.dark .sidebar a,
+    body.dark .bg-option span,
+    body.dark .upload small,
+    body.dark .popup {
+      color: #f0f0f0;
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar" id="sidebar">
+    <a href="#">🏠 Home</a>
+    <a href="#">🎮 Games</a>
+    <a href="#">🧠 AI</a>
+    <a href="#">🎵 Music</a>
+    <a href="#">💻 Code Editor</a>
+    <a href="#">🗨 Chat</a>
+    <a href="#">🎬 Media</a>
+  </div>
+
+  <div class="popup" id="popup">
+    <strong>Select a Background</strong>
+    <div class="background-options">
+      <div class="bg-option" data-img="https://nebulilabs.github.io/rso/coast/coast.jpg">
+        <img src="https://nebulilabs.github.io/rso/coast/coast.jpg" />
+        <span>Default (Coast)</span>
+      </div>
+      <div class="bg-option" data-img="https://nebulilabs.github.io/rso/coast/trees.jpg">
+        <img src="https://nebulilabs.github.io/rso/coast/trees.jpg" />
+        <span>Trees</span>
+      </div>
+      <div class="bg-option" data-img="https://nebulilabs.github.io/rso/coast/water.jpg">
+        <img src="https://nebulilabs.github.io/rso/coast/water.jpg" />
+        <span>Water</span>
+      </div>
+    </div>
+
+    <div class="upload">
+      <input type="file" id="uploadInput" accept="image/*" hidden />
+      <label for="uploadInput">Upload Image</label>
+      <small>Upload your own background. (Try to keep it naturey to fit the theme frfr)</small>
+    </div>
+
+    <div class="btn-row">
+      <button class="dark-btn" id="darkToggle">Toggle Dark Mode</button>
+      <button class="close-btn" onclick="popup.classList.remove('show')">Close</button>
+    </div>
+  </div>
+
+  <main>
+    <h1>coast</h1>
+    <input class="search-bar" type="text" placeholder="Search..."/>
+  </main>
+
+  <div class="button-container">
+    <div class="glass-circle" id="toggleSidebar">⏫️</div>
+    <div class="glass-circle" id="openPopup">✏️</div>
+  </div>
+
+  <script>
+    const toggle = document.getElementById("toggleSidebar");
+    const sidebar = document.getElementById("sidebar");
+    const popup = document.getElementById("popup");
+    const openPopup = document.getElementById("openPopup");
+    const bgOptions = document.querySelectorAll(".bg-option");
+    const uploadInput = document.getElementById("uploadInput");
+    const darkToggle = document.getElementById("darkToggle");
+
+    toggle.addEventListener("click", () => {
+      sidebar.classList.toggle("show");
+      toggle.textContent = sidebar.classList.contains("show") ? "⏬️" : "⏫️";
+    });
+
+    openPopup.addEventListener("click", () => {
+      popup.classList.add("show");
+    });
+
+    bgOptions.forEach(option => {
+      option.addEventListener("click", () => {
+        const url = option.dataset.img;
+        localStorage.setItem("coast_bg", url);
+        document.body.style.backgroundImage = `url('${url}')`;
+      });
+    });
+
+    uploadInput.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        const dataUrl = event.target.result;
+        localStorage.setItem("coast_bg", dataUrl);
+        document.body.style.backgroundImage = `url('${dataUrl}')`;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    darkToggle.addEventListener("click", () => {
+      document.body.classList.toggle("dark");
+      const isDark = document.body.classList.contains("dark");
+      localStorage.setItem("coast_dark", isDark ? "true" : "false");
+    });
+
+    const savedBG = localStorage.getItem("coast_bg");
+    if (savedBG) {
+      document.body.style.backgroundImage = `url('${savedBG}')`;
+    }
+
+    const savedDark = localStorage.getItem("coast_dark");
+    if (savedDark === "true") {
+      document.body.classList.add("dark");
+    }
+  </script>
+</body>
+</html>
